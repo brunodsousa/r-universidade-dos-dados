@@ -53,3 +53,63 @@ df_exemplo <- data.frame(
 write.csv(x = df_exemplo, file = "dados/notas_alunos.csv", row.names = FALSE)
 # Importar arquivo
 dados_csv <- read.csv(file = "dados/notas_alunos.csv", sep=",", dec = ".")
+# Criando novas colunas
+dados_csv$Media <- round(x = rowMeans(x = dados_csv[,2:4]), digits = 1)
+dados_csv$Resultado <- ifelse(test = dados_csv$Media > 7,
+                              yes = "Aprovado",
+                              no = "Reprovado")
+
+# Calcular a média geral das notas
+media_geral <- round(x = mean(dados_csv$Media), digits = 1)
+
+# Calcular a nota máxima e mínima
+nota_maxima <- max(dados_csv$Media)
+nota_minima <- min(dados_csv$Media)
+
+cat("Média Geral das Notas:", media_geral, "\n")
+cat("Maior Média:", nota_maxima, "\n")
+cat("Menor Média:", nota_minima, "\n")
+
+# Exportar os dados dos alunos aprovados para um novo arquivo CSV
+write.csv(x = estudantes_aprovados, file = "dados/estudantes_aprovados.csv",
+          row.names = FALSE)
+write.csv(x = dados_csv, file = "dados/dados_csv_completo.csv",
+          row.names = FALSE)
+
+
+# Manipulação de Excel
+
+install.packages("readxl")
+install.packages("writexl")
+
+library(readxl)
+library(writexl)
+
+# Importar arquivo
+dados_excel <- read_excel(path = "dados/HR-Employee-Attrition.xlsx")
+
+# Obter resumos estatísticos
+summary(object = dados_excel)
+
+# Média das idades
+mean(x = dados_excel$Age)
+
+# Mediana das idades
+median(x = dados_excel$Age)
+
+# Moda das idades
+install.packages("modeest")
+library("modeest")
+
+mlv(x = dados_excel$Age, method = "mfv")
+
+# Criar grupos de idade
+dados_excel$Grupo_Idade <- cut(x = dados_excel$Age,
+                              breaks = c(-Inf, 19, 29, Inf),
+                              labels = c("Jovem", "Adulto Jovem", "Adulto"))
+# Filtrar somente os jovens
+dados_excel_jovens <- subset(x = dados_excel, Grupo_Idade == "Jovem")
+View(x = dados_excel_jovens)
+
+# Exportar arquivo
+write_xlsx(x = dados_excel_jovens, path = "dados/dados_excel_jovens.xlsx")
