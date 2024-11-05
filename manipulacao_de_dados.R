@@ -1,5 +1,5 @@
-install.packages("DBI")
-install.packages("odbc")
+# install.packages("DBI")
+# install.packages("odbc")
 
 library(DBI)
 library(odbc)
@@ -38,7 +38,7 @@ dbDisconnect(conn = con)
 
 
 # Manipulação de CSV
-install.packages("readr")
+# install.packages("readr")
 library(readr)
 
 # Criar um dataframe de exemplo
@@ -79,8 +79,8 @@ write.csv(x = dados_csv, file = "dados/dados_csv_completo.csv",
 
 # Manipulação de Excel
 
-install.packages("readxl")
-install.packages("writexl")
+# install.packages("readxl")
+# install.packages("writexl")
 
 library(readxl)
 library(writexl)
@@ -98,7 +98,7 @@ mean(x = dados_excel$Age)
 median(x = dados_excel$Age)
 
 # Moda das idades
-install.packages("modeest")
+# install.packages("modeest")
 library("modeest")
 
 mlv(x = dados_excel$Age, method = "mfv")
@@ -113,3 +113,59 @@ View(x = dados_excel_jovens)
 
 # Exportar arquivo
 write_xlsx(x = dados_excel_jovens, path = "dados/dados_excel_jovens.xlsx")
+
+
+
+# Web Scraping
+
+# install.packages("rvest")
+# install.packages("dplyr")
+
+library(rvest)
+library(dplyr)
+
+# URL da página da Wikipédia com a lista de países e capitais
+url <- "https://pt.wikipedia.org/wiki/Lista_de_pa%C3%ADses_e_capitais_em_l%C3%ADnguas_locais"
+
+# Ler o conteúdo da página
+pagina <- read_html(x = url)
+
+# Extrair a tabela de países e capitais
+tabela_paises_capitais <- pagina %>% html_node("table.wikitable") %>% html_table()
+
+colnames(tabela_paises_capitais)
+# Renomeando colunas
+tabela_paises_capitais <- rename(.data = tabela_paises_capitais,
+                                 pais_exonimo = `País (exónimo)`,
+                                 capital_exonimo = `Capital (exónimo)`,
+                                 pais_endonimo = `País (endónimo)`,
+                                 capital_endonimo = `Capital (endónimo)`,
+                                 linguas_locais_oficiais = `Línguas locais oficiais (alfabeto/escrita)`)
+
+# PNAD contínua
+
+# install.packages("PNADcIBGE")
+# install.packages("magrittr")
+
+library(PNADcIBGE)
+library(magrittr)
+
+# install.packages("survey")
+# install.packages("srvyr")
+
+library(survey)
+library(srvyr)
+
+dados_pnadc <- get_pnadc(year = 2024, quarter = 1, vars = c("UF", "V2007",
+                                                            "V2009", "V2010",
+                                                            "V3001", "V4010",
+                                                            "V4010", "VD2003", 
+                                                            "VD3004", "VD4002",
+                                                            "VD4004A", "VD4005",
+                                                            "VD4008", "VD4010",
+                                                            "VD4012", "VD4020",
+                                                            "VD4023"))
+
+pnad_042024 <- dados_pnadc$variables[,c(1:3, 8, 9, 10, 15:28)]
+
+medicos <- subset(pnad_042024, V4010 == "2211" | V4010 == "2212")
